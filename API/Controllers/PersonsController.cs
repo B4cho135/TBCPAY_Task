@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using API.ActionFilters;
+using AutoMapper;
 using Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,15 +25,16 @@ namespace API.Controllers
         private readonly IRelatedPersonService _relatedPersonService;
         private readonly IPhoneService _phoneService;
         protected readonly IMapper _mapper;
-        public PersonsController(IPersonService personService, IRelatedPersonService relatedPersonService, IMapper mapper)
+        public PersonsController(IPersonService personService, IRelatedPersonService relatedPersonService, IMapper mapper, IPhoneService phoneService)
         {
             _personService = personService;
             _relatedPersonService = relatedPersonService;
             _mapper = mapper;
+            _phoneService = phoneService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(PersonSearchQuery query, int startPage, int Limit)
+        public async Task<IActionResult> Get([FromQuery]PersonSearchQuery query, int startPage, int Limit)
         {
             var persons =  _personService.Get().Include(x => x.RelatedPersons).Include(x => x.Phones);
 
@@ -101,6 +103,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(GeneralValidationAttribute))]
         public async Task<IActionResult> Create(CreatePersonRequest model)
         {
             var newPerson = new PersonEntity()
