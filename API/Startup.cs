@@ -41,6 +41,11 @@ namespace API
 
             services.AddTransient(typeof(IGenericService<,>), typeof(GenericService<,>));
             services.AddScoped<IPersonService, PersonService>();
+            services.AddScoped<IRelatedPersonService, RelatedPersonService>();
+            services.AddScoped<IPhoneService, PhoneService>();
+
+
+
             services.AddDbContext<DefaultDbContext>(
                     options => options.UseSqlServer("name=ConnectionStrings:Default"));
 
