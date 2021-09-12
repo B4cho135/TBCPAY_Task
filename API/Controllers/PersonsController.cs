@@ -32,8 +32,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(PersonSearchQuery query, int startPage, int Limit)
+        public async Task<IActionResult> Get([FromQuery]PersonSearchQuery query, int startPage, int Limit)
         {
+            throw new Exception("xeellooo suka blyat");
             var persons =  _personService.Get().Include(x => x.RelatedPersons).Include(x => x.Phones);
 
             if(!string.IsNullOrEmpty(query.FirstName))
