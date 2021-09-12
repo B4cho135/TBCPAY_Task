@@ -1,3 +1,5 @@
+
+using API.ActionFilters;
 using API.Extensions;
 using AutoMapper;
 using Core.Persistance;
@@ -13,6 +15,7 @@ using Services;
 using Services.Abstract;
 using Services.Profiles;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 
 namespace API
@@ -50,6 +53,9 @@ namespace API
             services.AddScoped<IRelatedPersonService, RelatedPersonService>();
             services.AddScoped<IPhoneService, PhoneService>();
             services.AddSingleton<ILoggerService, LoggerService>();
+
+
+            services.AddScoped<GeneralValidationAttribute>();
 
             services.AddDbContext<DefaultDbContext>(
                     options => options.UseSqlServer("name=ConnectionStrings:Default"));
