@@ -11,10 +11,10 @@ namespace Services.Abstract
 	public interface IGenericService<TEntity, TModel> where TEntity : class, new() where TModel : class, new()
 	{
 		DbSet<TEntity> Get();
-		Task<TModel> GetByIdAsync(Guid id);
+		Task<TModel> GetByIdAsync(int id);
 		Task<Response<TModel>> UpdateAsync(TEntity entity);
-		Task<Response<TModel>> AddAsync(TEntity entity);
-		Task<int> DeleteByIdAsync(Guid id);
+		Task<Response<TEntity>> AddAsync(TEntity entity);
+		Task<int> DeleteByIdAsync(int id);
 		Task<List<TModel>> GetAll();
 
 
