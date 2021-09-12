@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Enums
+namespace Core.Entities
 {
-    public enum GenderEnum
+    public class PhoneTypeEntity : BaseEntity<int>
     {
-        Male,
-        Female
+        public string Type { get; set; }
     }
 }

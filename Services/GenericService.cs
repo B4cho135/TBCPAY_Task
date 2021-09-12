@@ -23,13 +23,13 @@ namespace Services
 			Mapper = mapper;
 		}
 
-		public async virtual Task<TModel> GetByIdAsync(Guid id)
+		public async virtual Task<TModel> GetByIdAsync(int id)
 		{
 			TEntity entity = await Get().FindAsync(id);
 			TModel model = Mapper.Map<TModel>(entity);
 			return model;
 		}
-		public async Task<Response<TModel>> AddAsync(TEntity entity)
+		public async Task<Response<TEntity>> AddAsync(TEntity entity)
 		{
 			try
 			{
@@ -37,11 +37,11 @@ namespace Services
 				int status = await Context.SaveChangesAsync();
 
 
-				TModel model = Mapper.Map<TModel>(entity);
+				//TModel model = Mapper.Map<TModel>(entity); //instead of returning TModel, TEntity is returned because it's easier to located newly creared person.
 
-				var response = new Response<TModel>()
+				var response = new Response<TEntity>()
 				{
-					Item = model,
+					Item = entity,
 					StatusCode = status > 0 ? 201 : 400,
 					Message = status == 0 ? "There has been a problem adding the entity to database!":"The entity has been succesfully added!",
 					HasSucceeded = true
@@ -50,7 +50,7 @@ namespace Services
 			}
 			catch (Exception ex)
 			{
-				var response = new Response<TModel>()
+				var response = new Response<TEntity>()
 				{
 					Item = null,
 					StatusCode = 500,
@@ -63,7 +63,7 @@ namespace Services
 				return response;
 			}
 		}
-		public async Task<int> DeleteByIdAsync(Guid id)
+		public async Task<int> DeleteByIdAsync(int id)
 		{
 			TModel model = await this.GetByIdAsync(id);
 			TEntity entity = Mapper.Map<TEntity>(model);

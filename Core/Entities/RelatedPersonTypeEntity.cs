@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Enums
+namespace Core.Entities
 {
-    public enum RelationEnum
+    public class RelatedPersonTypeEntity : BaseEntity<int>
     {
-        colleague,
-        Familiar,
-        Relative,
-        Other
+        public string Type { get; set; }
     }
 }
