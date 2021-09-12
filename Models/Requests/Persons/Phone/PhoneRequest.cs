@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Persons
+namespace Models.Requests.Persons.Phone
 {
-    public class RelatedPersonModel
+    public class PhoneRequest
     {
-        public string RelationType { get; set; }
-        public PersonModel Person { get; set; }
+        public int TypeId { get; set; }
         public int PersonId { get; set; }
+        public string PhoneNumber { get; set; }
     }
 }
