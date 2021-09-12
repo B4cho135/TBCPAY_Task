@@ -22,5 +22,6 @@ namespace Core.Persistance
         public DbSet<RelatedPersonEntity> RelatedPersons { get; set; }
         public DbSet<RelatedPersonTypeEntity> RelatedPersonType { get; set; }
         public DbSet<PhoneTypeEntity> PhoneType { get; set; }
+
     }
 }

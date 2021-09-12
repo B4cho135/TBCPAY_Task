@@ -5,6 +5,6 @@
         public PhoneTypeEntity Type { get; set; }
         public int TypeId { get; set; }
         public string PhoneNumber { get; set; }
-        public int PersonId { get; set; }
+        public int PersonEntityId { get; set; }
     }
 }

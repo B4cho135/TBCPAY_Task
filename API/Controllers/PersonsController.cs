@@ -24,17 +24,19 @@ namespace API.Controllers
         private readonly IPersonService _personService;
         private readonly IRelatedPersonService _relatedPersonService;
         private readonly IPhoneService _phoneService;
-        protected readonly IMapper _mapper;
-        public PersonsController(IPersonService personService, IRelatedPersonService relatedPersonService, IMapper mapper, IPhoneService phoneService)
+        private readonly IMapper _mapper;
+        private readonly ILoggerService _logger;
+        public PersonsController(IPersonService personService, IRelatedPersonService relatedPersonService, IMapper mapper, IPhoneService phoneService, ILoggerService logger)
         {
             _personService = personService;
             _relatedPersonService = relatedPersonService;
             _mapper = mapper;
             _phoneService = phoneService;
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery]PersonSearchQuery query, int startPage, int Limit)
+        public async Task<IActionResult> Get([FromQuery]PersonSearchQuery query, int startPage = 0, int Limit = 20)
         {
             var persons =  _personService.Get().Include(x => x.RelatedPersons).Include(x => x.Phones);
 
@@ -88,7 +90,7 @@ namespace API.Controllers
         [HttpGet("{Id}")]
         public async Task<IActionResult> Get(int Id)
         {
-            var person = await _personService.Get().Include(x => x.Phones).Include(x => x.RelatedPersons).FirstOrDefaultAsync(x => !x.IsDeleted && x.Id == Id);
+            var person = await _personService.Get().Include(x => x.City).Include(x => x.Phones).Include(x => x.RelatedPersons).FirstOrDefaultAsync(x => !x.IsDeleted && x.Id == Id);
 
             if (person == null)
             {
@@ -112,7 +114,8 @@ namespace API.Controllers
                 CityId = model.CityId,
                 FirstName = model.FirstName,
                 IdentificationNumber = model.IdentificationNumber,
-                LastName = model.LastName
+                LastName = model.LastName,
+                Gender = model.Gender
             };
 
             var personServiceResponse = await _personService.AddAsync(newPerson);
@@ -122,52 +125,12 @@ namespace API.Controllers
                 return BadRequest(personServiceResponse.Message);
             }
 
-            foreach (var relatedPerson in model.RelatedPersons)
-            {
-                var newRelation = new RelatedPersonEntity()
-                {
-                    PersonId = personServiceResponse.Item.Id,
-                    RelationTypeId = relatedPerson.RelationTypeId
-                };
-
-                var relatedPersonServiceResponse = await _relatedPersonService.AddAsync(newRelation);
-
-                if (!relatedPersonServiceResponse.HasSucceeded)
-                {
-                    //log why
-                }
-
-            }
-
-            foreach (var phone in model.Phones)
-            {
-
-                var alreadyExists = _phoneService.Get().FirstOrDefault(x => x.IsDeleted == false && x.PhoneNumber == phone.PhoneNumber) != null;
-
-                if(alreadyExists)
-                {
-                    continue;
-                }
-
-                var newPhone = new PhoneEntity()
-                {
-                    TypeId = phone.TypeId,
-                    PersonId = personServiceResponse.Item.Id,
-                    PhoneNumber = phone.PhoneNumber
-                };
-                var phoneServiceResponse = await _phoneService.AddAsync(newPhone);
-
-                if (!phoneServiceResponse.HasSucceeded)
-                {
-                    //log why
-                }
-            }
-
-            return Created(Request.Path, personServiceResponse.Item.Id);
+            return Created(Request.Path, new { newEntityId =  personServiceResponse.Item.Id });
 
         }
 
         [HttpPut("{Id}")]
+        [ServiceFilter(typeof(GeneralValidationAttribute))]
         public async Task<IActionResult> Update(int Id, UpdatePersonRequest model)
         {
 
@@ -177,12 +140,6 @@ namespace API.Controllers
             {
                 return BadRequest($"person with Id - {Id} was not found to update");
             }
-
-            if(person.Gender != "Male" && person.Gender != "Female")
-            {
-                return BadRequest("Gender should be either Male or Female");
-            }
-
 
             person.IdentificationNumber = model.IdentificationNumber;
             person.Image = model.Image;
@@ -234,11 +191,32 @@ namespace API.Controllers
         [HttpGet("{Id}/RelatedPersons")]
         public async Task<IActionResult> GetRelatedPersons(int Id)
         {
-            var relatedPersons = await _relatedPersonService.Get().Where(x => x.IsDeleted == false && x.PersonId == Id).ToListAsync();
 
-            var relatedPersonsMapped = _mapper.Map<List<GetRelatedPersonRequest>>(relatedPersons);
+            var person = await _personService.Get()
+                .Include(x => x.City)
+                .Include(x=> x.Phones)
+                .Include(x => x.RelatedPersons).ThenInclude(m => m.RelationType).FirstOrDefaultAsync(x => x.IsDeleted == false && x.Id == Id);
 
-            return Ok(relatedPersonsMapped);
+            var relatedPersons = new List<RelatedPersonModel>();
+
+            foreach(var relatedPersoniter in person.RelatedPersons)
+            {
+                if (!relatedPersoniter.IsDeleted)
+                {
+                    var relatedPerson = await _personService.Get().Include(x => x.Phones).Include(x => x.City).FirstOrDefaultAsync(x => x.Id == relatedPersoniter.RelatedPersonId && !x.IsDeleted);
+                    if (relatedPerson != null)
+                    {
+                        relatedPersons.Add(new RelatedPersonModel()
+                        {
+                            RelatedPerson = _mapper.Map<PersonModel>(relatedPerson),
+                            RelationType = new RelationTypeModel() { Type = relatedPersoniter.RelationType.Type }
+                        });
+                    }
+                }
+                
+            }
+
+            return Ok(relatedPersons);
 
         }
 
@@ -247,8 +225,9 @@ namespace API.Controllers
         {
             var newRelatedPerson = new RelatedPersonEntity()
             {
-                PersonId = model.PersonId,
-                RelationTypeId = model.RelationTypeId
+                PersonId = Id,
+                RelationTypeId = model.RelationTypeId,
+                RelatedPersonId = model.PersonId
             };
 
             var relatedPersonServiceRespnse = await _relatedPersonService.AddAsync(newRelatedPerson);
@@ -268,7 +247,7 @@ namespace API.Controllers
         {
             var person = _personService.Get().Include(x => x.RelatedPersons).FirstOrDefault(x => !x.IsDeleted && x.Id == Id);
 
-            var relatedPerson = person.RelatedPersons.FirstOrDefault(x => !x.IsDeleted && x.PersonId == relatedPersonId);
+            var relatedPerson = person.RelatedPersons.FirstOrDefault(x => !x.IsDeleted && x.RelatedPersonId == relatedPersonId);
 
             if (relatedPerson != null)
             {
@@ -295,7 +274,7 @@ namespace API.Controllers
         {
             var newRelatedPerson = new PhoneEntity()
             {
-                PersonId = Id,
+                PersonEntityId = Id,
                 PhoneNumber = model.PhoneNumber,
                 TypeId = model.TypeId
             };
@@ -312,12 +291,12 @@ namespace API.Controllers
             return Created(Request.Path, mappedRelatedPerson);
         }
 
-        [HttpDelete("{Id}/RelatedPersons/{phoneId}")]
+        [HttpDelete("{Id}/Phone/{phoneId}")]
         public async Task<IActionResult> DeletePhone(int Id, int phoneId)
         {
             var person = _personService.Get().Include(x => x.Phones).FirstOrDefault(x => !x.IsDeleted && x.Id == Id);
 
-            var phone = person.Phones.FirstOrDefault(x => !x.IsDeleted && x.PersonId == Id && x.Id == phoneId);
+            var phone = person.Phones.FirstOrDefault(x => !x.IsDeleted && x.PersonEntityId == Id && x.Id == phoneId);
 
             if (phone != null)
             {
@@ -338,12 +317,12 @@ namespace API.Controllers
 
         }
 
-        [HttpPut("{Id}/RelatedPersons/{phoneId}")]
+        [HttpPut("{Id}/Phone/{phoneId}")]
         public async Task<IActionResult> UpdatePhone(int Id, int phoneId, UpdatePhoneRequest model)
         {
             var person = _personService.Get().Include(x => x.Phones).FirstOrDefault(x => !x.IsDeleted && x.Id == Id);
 
-            var phone = person.Phones.FirstOrDefault(x => !x.IsDeleted && x.PersonId == Id && x.Id == phoneId);
+            var phone = person.Phones.FirstOrDefault(x => !x.IsDeleted && x.PersonEntityId == Id && x.Id == phoneId);
 
             if (phone != null)
             {

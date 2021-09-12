@@ -83,7 +83,7 @@ namespace API
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
-            app.ConfigureExceptionHandler(logger);
+            //app.ConfigureExceptionHandler(logger);
 
 
             app.UseHttpsRedirection();

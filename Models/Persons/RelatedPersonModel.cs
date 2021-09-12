@@ -10,7 +10,6 @@ namespace Models.Persons
     public class RelatedPersonModel
     {
         public RelationTypeModel RelationType { get; set; }
-        public PersonModel Person { get; set; }
-        public int PersonId { get; set; }
+        public PersonModel RelatedPerson { get; set; }
     }
 }

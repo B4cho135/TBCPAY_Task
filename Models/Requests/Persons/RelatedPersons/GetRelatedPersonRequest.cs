@@ -10,6 +10,6 @@ namespace Models.Requests.Persons.RelatedPersons
     public class GetRelatedPersonRequest
     {
         public RelationTypeModel RelationType { get; set; }
-        public PersonModel Person { get; set; }
+        public PersonModel RelatedPerson { get; set; }
     }
 }

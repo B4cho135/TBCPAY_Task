@@ -18,6 +18,8 @@ namespace API.ActionFilters
 
             var BirthDate = (DateTime?)model["BirthDate"];
 
+            var gender = (string)model["Gender"];
+
             var age = (DateTime.Now.Year - BirthDate.Value.Year);
 
             if (BirthDate.HasValue && BirthDate.Value.Month > DateTime.Now.Month)
@@ -31,7 +33,13 @@ namespace API.ActionFilters
                 return;
             }
 
-            if(!context.ModelState.IsValid)
+            if (gender != "Male" && gender != "Female")
+            {
+                context.Result = new BadRequestObjectResult("Gender should be either Male or Female");
+                return;
+            }
+
+            if (!context.ModelState.IsValid)
             {
                 context.Result = new BadRequestObjectResult(context.ModelState);
             }
