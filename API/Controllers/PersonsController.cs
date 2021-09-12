@@ -164,7 +164,7 @@ namespace API.Controllers
 
         }
 
-        [HttpPut("Id")]
+        [HttpPut("{Id}")]
         public async Task<IActionResult> Update(int Id, UpdatePersonRequest model)
         {
 
@@ -199,7 +199,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("Id")]
+        [HttpDelete("{Id}")]
         public async Task<IActionResult> Delete(int Id)
         {
             var person = _personService.Get().FirstOrDefault(x => x.Id == Id);
