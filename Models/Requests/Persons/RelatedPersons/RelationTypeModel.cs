@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Models.Requests.Persons.RelatedPersons
 {
-    public class RelatedPersonRequest
+    public class RelationTypeModel
     {
-        public int RelationTypeId { get; set; }
-        public int PersonId { get; set; }
+        public string Type { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Core.Entities;
 using Core.Persistance;
+using Microsoft.EntityFrameworkCore;
 using Models.Persons;
 using Services.Abstract;
 using System;
@@ -17,5 +18,11 @@ namespace Services
         {
 
         }
+
+
+        //public async Task<List<PersonReport>> GenerateReport()
+        //{
+
+        //}
     }
 }

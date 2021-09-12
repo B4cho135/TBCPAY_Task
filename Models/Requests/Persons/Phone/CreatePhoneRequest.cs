@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.Requests.Persons.Phone
 {
-    public class PhoneRequest
+    public class CreatePhoneRequest
     {
         public int TypeId { get; set; }
-        public int PersonId { get; set; }
         public string PhoneNumber { get; set; }
     }
 }

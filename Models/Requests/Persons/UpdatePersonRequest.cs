@@ -16,8 +16,8 @@ namespace Models.Requests.Persons
         public string IdentificationNumber { get; set; }
         public DateTime BirthDate { get; set; }
         public int CityId { get; set; }
-        public List<PhoneRequest> Phones { get; set; }
+        public List<CreatePhoneRequest> Phones { get; set; }
         public string Image { get; set; }
-        public List<RelatedPersonRequest> RelatedPersons { get; set; }
+        public List<CreateRelatedPersonRequest> RelatedPersons { get; set; }
     }
 }

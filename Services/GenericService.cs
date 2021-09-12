@@ -50,7 +50,7 @@ namespace Services
 			}
 			catch (Exception ex)
 			{
-				var response = new Response<TModel>()
+				var response = new Response<TEntity>()
 				{
 					Item = null,
 					StatusCode = 500,
