@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Enums
+namespace Core.Entities
 {
-    public enum PhoneEnum
+    public class PhoneTypeEntity : BaseEntity<int>
     {
-        Mobile,
-        Office,
-        Home
+        public string Type { get; set; }
     }
 }
