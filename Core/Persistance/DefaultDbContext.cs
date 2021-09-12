@@ -20,5 +20,8 @@ namespace Core.Persistance
         public DbSet<CityEntity> Cities { get; set; }
         public DbSet<PhoneEntity> Phones { get; set; }
         public DbSet<RelatedPersonEntity> RelatedPersons { get; set; }
+        public DbSet<RelatedPersonTypeEntity> RelatedPersonType { get; set; }
+        public DbSet<PhoneTypeEntity> PhoneType { get; set; }
+
     }
 }

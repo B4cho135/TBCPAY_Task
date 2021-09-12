@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Core.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    [Migration("20210908154135_Initial Migration")]
-    partial class InitialMigration
+    [Migration("20210912214926_another Person Enitity")]
+    partial class anotherPersonEnitity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,10 +55,10 @@ namespace Core.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Birthdate")
+                    b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("CitiesId")
+                    b.Property<int>("CityId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -67,11 +67,11 @@ namespace Core.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Firstname")
+                    b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Gender")
-                        .HasColumnType("int");
+                    b.Property<string>("Gender")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("IdentificationNumber")
                         .HasColumnType("nvarchar(max)");
@@ -82,7 +82,7 @@ namespace Core.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Lastname")
+                    b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -90,7 +90,7 @@ namespace Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CitiesId");
+                    b.HasIndex("CityId");
 
                     b.ToTable("Persons");
                 });
@@ -111,13 +111,13 @@ namespace Core.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("PersonEntityId")
+                    b.Property<int>("PersonEntityId")
                         .HasColumnType("int");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("TypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -127,10 +127,39 @@ namespace Core.Migrations
 
                     b.HasIndex("PersonEntityId");
 
+                    b.HasIndex("TypeId");
+
                     b.ToTable("Phones");
                 });
 
-            modelBuilder.Entity("Core.Entities.RelatedPerson", b =>
+            modelBuilder.Entity("Core.Entities.PhoneTypeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PhoneType");
+                });
+
+            modelBuilder.Entity("Core.Entities.RelatedPersonEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +178,10 @@ namespace Core.Migrations
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
-                    b.Property<int>("RelationType")
+                    b.Property<int>("RelatedPersonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RelationTypeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -157,36 +189,85 @@ namespace Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PersonId");
+                    b.HasIndex("RelatedPersonId");
+
+                    b.HasIndex("RelationTypeId");
 
                     b.ToTable("RelatedPersons");
                 });
 
+            modelBuilder.Entity("Core.Entities.RelatedPersonTypeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RelatedPersonType");
+                });
+
             modelBuilder.Entity("Core.Entities.PersonEntity", b =>
                 {
-                    b.HasOne("Core.Entities.CityEntity", "Cities")
+                    b.HasOne("Core.Entities.CityEntity", "City")
                         .WithMany()
-                        .HasForeignKey("CitiesId");
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Cities");
+                    b.Navigation("City");
                 });
 
             modelBuilder.Entity("Core.Entities.PhoneEntity", b =>
                 {
                     b.HasOne("Core.Entities.PersonEntity", null)
                         .WithMany("Phones")
-                        .HasForeignKey("PersonEntityId");
-                });
-
-            modelBuilder.Entity("Core.Entities.RelatedPerson", b =>
-                {
-                    b.HasOne("Core.Entities.PersonEntity", "Person")
-                        .WithMany("RelatedPersons")
-                        .HasForeignKey("PersonId")
+                        .HasForeignKey("PersonEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Person");
+                    b.HasOne("Core.Entities.PhoneTypeEntity", "Type")
+                        .WithMany()
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Type");
+                });
+
+            modelBuilder.Entity("Core.Entities.RelatedPersonEntity", b =>
+                {
+                    b.HasOne("Core.Entities.PersonEntity", "RelatedPerson")
+                        .WithMany("RelatedPersons")
+                        .HasForeignKey("RelatedPersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Core.Entities.RelatedPersonTypeEntity", "RelationType")
+                        .WithMany()
+                        .HasForeignKey("RelationTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RelatedPerson");
+
+                    b.Navigation("RelationType");
                 });
 
             modelBuilder.Entity("Core.Entities.PersonEntity", b =>

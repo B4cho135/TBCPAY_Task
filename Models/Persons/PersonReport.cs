@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Models.Persons
 {
-    public class PhoneModel
+    public class PersonReport
     {
-        public PhoneTypeModel Type { get; set; }
-        public string PhoneNumber { get; set; }
+        public int PersonId { get; set; }
+        public ReportByRelatedPersonType QuantityOfPersonsRelatedByType { get; set; }
     }
 }

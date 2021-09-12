@@ -15,6 +15,15 @@ namespace Services.Profiles
         {
             CreateMap<PersonEntity, PersonModel>();
             CreateMap<PersonModel, PersonEntity>();
+            CreateMap<RelatedPersonModel, RelatedPersonEntity>();
+            CreateMap<RelatedPersonEntity, RelatedPersonModel>();
+            CreateMap<PhoneEntity, PhoneModel>();
+            CreateMap<PhoneModel, PhoneEntity>();
+            CreateMap<CityModel, CityEntity>();
+            CreateMap<CityEntity, CityModel>();
+            CreateMap<PhoneTypeEntity, PhoneTypeModel>();
+            CreateMap<PhoneTypeModel, PhoneTypeEntity>();
+
         }
     }
 }

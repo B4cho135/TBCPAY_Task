@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Enums
+namespace Models.Persons
 {
-    public enum RelationEnum
+    public class PhoneTypeModel
     {
-        colleague,
-        Familiar,
-        Relative,
-        Other
+        public string Type { get; set; }
     }
 }
